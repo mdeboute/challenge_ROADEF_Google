@@ -1,10 +1,19 @@
 # challenge_ROADEF_Google
 
-activer l'env. virtuel :
-`source .venv/bin/activate`
+Activer l'env. virtuel :
 
-fermer
-`exit`
+```shell
+source .venv/bin/activate
+```
 
-exécuter script
-`python src/run.py`
+Le fermer :
+
+```shell
+exit
+```
+
+Exécuter le script Python :
+
+```shell
+python src/run.py
+```

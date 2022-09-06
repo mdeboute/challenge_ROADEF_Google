@@ -1,6 +1,6 @@
 import sys
 
-import parser
+import parse
 import problem as pb
 import checker
 from solver import *
@@ -12,7 +12,7 @@ def mainFunction(
     print("Received instance files ", instanceFilename, " and ", assignmentFilename)
 
     # reading the data
-    data = parser.parseFiles(instanceFilename, assignmentFilename)
+    data = parse.parseFiles(instanceFilename, assignmentFilename)
 
     if verbose:
         pb.printData(data)
