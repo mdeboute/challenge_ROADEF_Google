@@ -38,14 +38,57 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     smc = model.add_var(var_type=CONTINUOUS, lb=0)
 
     # Constraints
+
+    # Assignment
     for p in range(data.nbProcess):
         model += xsum(x[p][m] for m in range(data.nbMachines)) == 1
 
+    # Capacity
     for r in range(data.nbResources):
         for m in range(data.nbMachines):
             model += (
-                xsum(data.processReq[p][r] * x[p][m] for m in range(data.nbMachines))
+                xsum(data.processReq[p][r] * x[p][m] for p in range(data.nbProcess))
                 <= data.hardResCapacities[m][r]
             )
+
+    # Conflict
+    for s in range(data.nbServices):
+        for m in range(data.nbMachines):
+            model += xsum(x[p][m] for p in s) <= 1
+
+    # Spread
+    for l in range(data.nbLocations):
+        for s in range(data.nbServices):
+            model += (
+                xsum(xsum(x[p][m] for p in s) for m in l)
+                <= data.nbLocations * data.nbServices * y[s][l]
+            )
+
+    for l in range(data.nbLocations):
+        for s in range(data.nbServices):
+            model += xsum(xsum(x[p][m] for p in s) for m in l) >= y[s][l]
+
+    for s in range(data.nbServices):
+        model += xsum(y[s][l] for l in range(data.nbLocations)) >= data.spreadMin[s]
+
+    # Transient
+    for r in range(data.nbResources):
+        if data.transientStatus[r] == 1:
+            for m in range(data.nbMachines):
+                model += (
+                    xsum(
+                        data.processReq[p][r]
+                        for p in range(data.nbProcess)
+                        if data.initialAssignment[p] == m
+                    )
+                    + xsum(
+                        data.processReq[p][r] * x[p][m]
+                        for p in range(data.nbProcess)
+                        if data.initialAssignment[p] != m
+                    )
+                    <= data.hardResCapacities[m][r]
+                )
+
+    # Dependency 1
 
     return
