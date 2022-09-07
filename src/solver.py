@@ -119,10 +119,10 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                 xsum(
                     xsum(
                         x[p][m]
-                        for p in range(data.nbServices)
+                        for p in range(data.nbProcess)
                         if data.servicesProcess[p] == s
                     )
-                    for m in range(data.nbLocations)
+                    for m in range(data.nbMachines)
                     if data.locations[m] == l
                 )
                 <= data.nbLocations * data.nbServices * y[s][l]
@@ -135,10 +135,10 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                 xsum(
                     xsum(
                         x[p][m]
-                        for p in range(data.nbServices)
+                        for p in range(data.nbProcess)
                         if data.servicesProcess[p] == s
                     )
-                    for m in range(data.nbLocations)
+                    for m in range(data.nbMachines)
                     if data.locations[m] == l
                 )
                 >= y[s][l],
