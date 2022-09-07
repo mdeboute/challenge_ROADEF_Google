@@ -145,13 +145,14 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     # Dependency 2
     for s in range(data.nbServices):
         for n in range(data.nbNeighborhoods):
-            for p in range(data.nbServices):
-                for m in range(data.nbNeighborhoods):
-                    if data.servicesProcess[p] == s and data.locations[m] == n:
-                        model += (
-                            x[p][m] <= z[s][n],
-                            "Dependency 2",
-                        )
+            for p in range(data.nbProcess):
+                if data.servicesProcess[p] == s:
+                    for m in range(data.nbMachines):
+                        if data.neighborhoods[m] == n:
+                            model += (
+                                x[p][m] <= z[s][n],
+                                "Dependency 2",
+                            )
 
     # Dependency 3
     for s in range(data.nbServices):
@@ -160,10 +161,10 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                 xsum(
                     xsum(
                         x[p][m]
-                        for m in range(data.nbNeighborhoods)
-                        if data.locations[m] == n
+                        for m in range(data.nbMachines)
+                        if data.neighborhoods[m] == n
                     )
-                    for p in range(data.nbServices)
+                    for p in range(data.nbProcess)
                     if data.servicesProcess[p] == s
                 )
                 >= z[s][n]
@@ -269,7 +270,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     assignment = []
     for p in range(data.nbProcess):
         for m in range(data.nbMachines):
-            if x[p][m].x is not None and x[p][m].x > 0.9:
+            if x[p][m].x > 0.9:
                 assignment.append(m)
 
     return pb.Solution(assignment, model.objective_value)
