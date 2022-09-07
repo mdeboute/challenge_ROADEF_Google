@@ -193,7 +193,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
         for m in range(data.nbMachines):
             model += (
                 bc_1[b][m]
-                <= data.balanceTriples[b].target
+                >= data.balanceTriples[b].target
                 * a[m][data.balanceTriples[b].resource1]
                 - a[m][data.balanceTriples[b].resource2]
             )
