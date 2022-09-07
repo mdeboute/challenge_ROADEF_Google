@@ -98,7 +98,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
             model += (
                 xsum(data.processReq[p][r] * x[p][m] for p in range(data.nbProcess))
                 <= data.hardResCapacities[m][r]
-            ), "Capacity"
+            ), "Capacity_" + str(r) + "_" + str(m)
 
     # Conflict
     for s in range(data.nbServices):
@@ -110,7 +110,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                     if data.servicesProcess[p] == s
                 )
                 <= 1
-            ), "Conflict"
+            ), "Conflict_" + str(s) + "_" + str(m)
 
     # Spread 1
     for l in range(data.nbLocations):
@@ -126,7 +126,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                     if data.locations[m] == l
                 )
                 <= data.nbLocations * data.nbServices * y[s][l]
-            ), "Spread_1"
+            ), "Spread_1_" + str(l) + "_" + str(s)
 
     # Spread 2
     for l in range(data.nbLocations):
@@ -142,14 +142,14 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                     if data.locations[m] == l
                 )
                 >= y[s][l],
-                "Spread_2",
+                "Spread_2_" + str(l) + "_" + str(s),
             )
 
     # Spread 3
     for s in range(data.nbServices):
         model += (
             xsum(y[s][l] for l in range(data.nbLocations)) >= data.spreadMin[s],
-            "Spread_3",
+            "Spread_3" + str(s),
         )
 
     # Transient
@@ -168,13 +168,13 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                         if data.initialAssignment[p] != m
                     )
                     <= data.hardResCapacities[m][r]
-                ), "Transient"
+                ), "Transient" + str(r) + "_" + str(m)
 
     # Dependency 1
     for s1 in range(data.nbServices):
         for s2 in data.dependencies[s1]:
             for n in range(data.nbNeighborhoods):
-                model += z[s1][n] <= z[s2][n], "Dependency_1"
+                model += z[s1][n] <= z[s2][n], "Dependency_1" + str(s1) + "_" + str(s2)
 
     # Dependency 2
     for s in range(data.nbServices):
@@ -184,8 +184,8 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                     for m in range(data.nbMachines):
                         if data.neighborhoods[m] == n:
                             model += (
-                                x[p][m] <= z[s][n],
-                                "Dependency_2",
+                                (x[p][m] <= z[s][n]),
+                                "Dependency_2" + str(s) + "_" + str(n) + "_" + str(p),
                             )
 
     # Dependency 3
@@ -202,7 +202,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                     if data.servicesProcess[p] == s
                 )
                 >= z[s][n]
-            ), "Dependency_3"
+            ), "Dependency_3" + str(s) + "_" + str(n)
 
     # Objective constraints:
     # Load cost
@@ -246,7 +246,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     for s in range(data.nbServices):
         smc_1[s] = xsum(
             (1 - x[p][data.initialAssignment[p]])
-            for p in range(data.nbServices)
+            for p in range(data.nbProcess)
             if data.servicesProcess[p] == s
         )
 
