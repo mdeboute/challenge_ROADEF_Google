@@ -133,3 +133,6 @@ poetry.lock
 
 # Draft
 dump.py
+
+# LP model
+model.lp

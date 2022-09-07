@@ -88,9 +88,9 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     # Constraints:
     # Assignment
     for p in range(data.nbProcess):
-        model += xsum(x[p][m] for m in range(data.nbMachines)) == 1, "Assignment_" + str(
-            p
-        )
+        model += xsum(
+            x[p][m] for m in range(data.nbMachines)
+        ) == 1, "Assignment_" + str(p)
 
     # Capacity
     for r in range(data.nbResources):
