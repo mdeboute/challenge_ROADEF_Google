@@ -70,10 +70,13 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     for s in range(data.nbServices):
         for m in range(data.nbMachines):
             model += (
-                xsum(x[data.servicesProcess[p]][m] for p in range(data.nbServices))
-                <= 1,
-                "Conflict",
-            )
+                xsum(
+                    x[p][m]
+                    for p in range(data.nbServices)
+                    if data.servicesProcess[p] == s
+                )
+                <= 1
+            ), "Conflict"
 
     # Spread 1
     for l in range(data.nbLocations):
@@ -81,10 +84,12 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
             model += (
                 xsum(
                     xsum(
-                        x[data.servicesProcess[p]][data.locations[m]]
+                        x[p][m]
                         for p in range(data.nbServices)
+                        if data.servicesProcess[p] == s
                     )
                     for m in range(data.nbLocations)
+                    if data.locations[m] == l
                 )
                 <= data.nbLocations * data.nbServices * y[s][l]
             ), "Spread 1"
@@ -95,10 +100,12 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
             model += (
                 xsum(
                     xsum(
-                        x[data.servicesProcess[p]][data.locations[m]]
+                        x[p][m]
                         for p in range(data.nbServices)
+                        if data.servicesProcess[p] == s
                     )
                     for m in range(data.nbLocations)
+                    if data.locations[m] == l
                 )
                 >= y[s][l],
                 "Spread 2",
@@ -140,10 +147,11 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
         for n in range(data.nbNeighborhoods):
             for p in range(data.nbServices):
                 for m in range(data.nbNeighborhoods):
-                    model += (
-                        x[data.servicesProcess[p]][data.locations[m]] <= z[s][n],
-                        "Dependency 2",
-                    )
+                    if data.servicesProcess[p] == s and data.locations[m] == n:
+                        model += (
+                            x[p][m] <= z[s][n],
+                            "Dependency 2",
+                        )
 
     # Dependency 3
     for s in range(data.nbServices):
@@ -151,10 +159,12 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
             model += (
                 xsum(
                     xsum(
-                        x[data.servicesProcess[p]][data.locations[m]]
+                        x[p][m]
                         for m in range(data.nbNeighborhoods)
+                        if data.locations[m] == n
                     )
                     for p in range(data.nbServices)
+                    if data.servicesProcess[p] == s
                 )
                 >= z[s][n]
             ), "Dependency 3"
@@ -200,8 +210,9 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     # Service move cost
     for s in range(data.nbServices):
         smc_1[s] = xsum(
-            (1 - x[p][data.initialAssignment[data.servicesProcess[p]]])
+            (1 - x[p][data.initialAssignment[p]])
             for p in range(data.nbServices)
+            if data.servicesProcess[p] == s
         )
 
     for s in range(data.nbServices):
@@ -254,18 +265,11 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                 model.objective_bound
             )
         )
-    if (
-        status == OptimizationStatus.OPTIMAL or status == OptimizationStatus.FEASIBLE
-    ) and verbose:
-        print("solution:")
-        for v in model.vars:
-            if abs(v.x) > 1e-6:  # only printing non-zeros
-                print("{} : {} ".format(model.name, model.x))
 
     assignment = []
     for p in range(data.nbProcess):
         for m in range(data.nbMachines):
-            if x[p][m].x is not None and x[p][m].x > 0.5:
+            if x[p][m].x is not None and x[p][m].x > 0.9:
                 assignment.append(m)
 
     return pb.Solution(assignment, model.objective_value)
