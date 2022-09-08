@@ -119,7 +119,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     )
 
     # Constraints:
-
+    # Sets definition:
     initialProcessesInMachine = np.frompyfunc(list, 0, 1)(
         np.empty(data.nbMachines, dtype=object)
     )
@@ -177,25 +177,12 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                 xsum(x[p][m] for p in processesOfService[s]) <= 1
             ), "Conflict_" + str(s) + "_" + str(m)
 
-    """# Spread 1
-    for l in range(data.nbLocations):
-        for s in range(data.nbServices):
-            model += (
-                xsum(
-                    xsum(x[p][m] for m in machinesOfLocation[l])
-                    for p in processesOfService[s]
-                )
-                <= data.nbLocations * data.nbServices * y[s][l]
-            ), "Spread_1_" + str(l) + "_" + str(s) """
-
     # Spread 1
     for l in range(data.nbLocations):
         for s in range(data.nbServices):
             for p in processesOfService[s]:
                 for m in machinesOfLocation[l]:
-                    model += (
-                        x[p][m] <= y[s][l], "Spread_1_" + str(l) + "_" + str(s)
-                    )
+                    model += (x[p][m] <= y[s][l], "Spread_1_" + str(l) + "_" + str(s))
 
     # Spread 2
     for l in range(data.nbLocations):
@@ -337,9 +324,9 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     model.write("model.lp")
 
     # Limitation of the number of processors
-    model.threads = 3
+    model.threads = 1
     model.max_seconds = maxTime
-    model.max_mip_gap = 1e-4
+    model.max_mip_gap = 1e-8
     model.max_mip_gap_abs = 1
     model.solver.set_verbose(verbose)
 

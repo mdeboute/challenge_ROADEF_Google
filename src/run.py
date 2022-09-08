@@ -1,4 +1,5 @@
 import sys
+from tabnanny import verbose
 
 import parse
 import problem as pb
@@ -36,16 +37,22 @@ def mainFunction(
 
 
 if __name__ == "__main__":
-    instanceFilename = "./data/model_toy.txt"
-    assignmentFilename = "./data/assignment_toy.txt"
+    instanceFilename = "./data/dataA/model_a1_1.txt"
+    assignmentFilename = "./data/dataA/assignment_a1_1.txt"
     timeLimit = 600
+    verbose = True
 
     if len(sys.argv) == 4:
-        # print("You should provide exactly 3 arguments : instanceFilename, assignmentFilename and timeLimit")
-        # print("Usage: python3 run.py data/dataA/model_a1_1.txt data/dataA/assignment_a1_1.txt 300")
+        print(
+            "You should provide exactly 4 arguments : instanceFilename, assignmentFilename, timeLimit and verbose"
+        )
+        print(
+            "Usage: python3 run.py data/dataA/model_a1_1.txt data/dataA/assignment_a1_1.txt 300 True"
+        )
 
         instanceFilename = sys.argv[1]
         assignmentFilename = sys.argv[2]
         timeLimit = int(sys.argv[3])
+        verbose = sys.argv[4]
 
-    mainFunction(instanceFilename, assignmentFilename, False, timeLimit)
+    mainFunction(instanceFilename, assignmentFilename, verbose, timeLimit)
