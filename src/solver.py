@@ -3,87 +3,113 @@
 
 from mip import *
 import problem as pb
+import numpy as np
+import time
 
 
 def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
 
-    model = Model(sense=MINIMIZE, solver_name=GRB)
+    model = Model(name="GoogleChallenge", sense=MINIMIZE, solver_name=GRB)
     model.verbose = int(verbose)
 
     # Variables:
-    x = [
+    x = np.array(
         [
-            model.add_var(var_type=BINARY, name="x(" + str(i) + "," + str(j) + ")")
-            for i in range(data.nbMachines)
+            [
+                model.add_var(var_type=BINARY, name="x(" + str(i) + "," + str(j) + ")")
+                for i in range(data.nbMachines)
+            ]
+            for j in range(data.nbProcess)
         ]
-        for j in range(data.nbProcess)
-    ]
+    )
 
-    y = [
+    y = np.array(
         [
-            model.add_var(var_type=BINARY, name="y(" + str(i) + "," + str(j) + ")")
-            for i in range(data.nbLocations)
+            [
+                model.add_var(var_type=BINARY, name="y(" + str(i) + "," + str(j) + ")")
+                for i in range(data.nbLocations)
+            ]
+            for j in range(data.nbServices)
         ]
-        for j in range(data.nbServices)
-    ]
+    )
 
-    z = [
+    z = np.array(
         [
-            model.add_var(var_type=BINARY, name="z(" + str(i) + "," + str(j) + ")")
-            for i in range(data.nbNeighborhoods)
+            [
+                model.add_var(var_type=BINARY, name="z(" + str(i) + "," + str(j) + ")")
+                for i in range(data.nbNeighborhoods)
+            ]
+            for j in range(data.nbServices)
         ]
-        for j in range(data.nbServices)
-    ]
+    )
 
-    lc_1 = [
+    lc_1 = np.array(
         [
-            model.add_var(
-                var_type=CONTINUOUS, lb=0, name="lc_1(" + str(i) + "," + str(j) + ")"
-            )
+            [
+                model.add_var(
+                    var_type=CONTINUOUS,
+                    lb=0,
+                    name="lc_1(" + str(i) + "," + str(j) + ")",
+                )
+                for i in range(data.nbResources)
+            ]
+            for j in range(data.nbMachines)
+        ]
+    )
+
+    lc_2 = np.array(
+        [
+            model.add_var(var_type=CONTINUOUS, lb=0, name="lc_2(" + str(i) + ")")
             for i in range(data.nbResources)
         ]
-        for j in range(data.nbMachines)
-    ]
+    )
 
-    lc_2 = [
-        model.add_var(var_type=CONTINUOUS, lb=0, name="lc_2(" + str(i) + ")")
-        for i in range(data.nbResources)
-    ]
-
-    a = [
+    a = np.array(
         [
-            model.add_var(var_type=CONTINUOUS, lb=0, name="a(" + str(i) + ")")
-            for i in range(data.nbResources)
+            [
+                model.add_var(var_type=CONTINUOUS, lb=0, name="a(" + str(i) + ")")
+                for i in range(data.nbResources)
+            ]
+            for j in range(data.nbMachines)
         ]
-        for j in range(data.nbMachines)
-    ]
+    )
 
-    bc_1 = [
+    bc_1 = np.array(
         [
-            model.add_var(
-                var_type=CONTINUOUS, lb=0, name="bc_1(" + str(i) + "," + str(j) + ")"
-            )
-            for i in range(data.nbMachines)
+            [
+                model.add_var(
+                    var_type=CONTINUOUS,
+                    lb=0,
+                    name="bc_1(" + str(i) + "," + str(j) + ")",
+                )
+                for i in range(data.nbMachines)
+            ]
+            for j in range(data.nbBalanceTriples)
         ]
-        for j in range(data.nbBalanceTriples)
-    ]
+    )
 
-    bc_2 = [
-        model.add_var(var_type=CONTINUOUS, lb=0, name="bc_2(" + str(i) + ")")
-        for i in range(data.nbBalanceTriples)
-    ]
+    bc_2 = np.array(
+        [
+            model.add_var(var_type=CONTINUOUS, lb=0, name="bc_2(" + str(i) + ")")
+            for i in range(data.nbBalanceTriples)
+        ]
+    )
 
-    smc_1 = [
-        model.add_var(var_type=CONTINUOUS, lb=0, name="smc_1(" + str(i) + ")")
-        for i in range(data.nbServices)
-    ]
+    smc_1 = np.array(
+        [
+            model.add_var(var_type=CONTINUOUS, lb=0, name="smc_1(" + str(i) + ")")
+            for i in range(data.nbServices)
+        ]
+    )
 
     smc_2 = model.add_var(var_type=CONTINUOUS, lb=0, name="smc_2")
 
-    mmc_1 = [
-        model.add_var(var_type=CONTINUOUS, lb=0, name="mmc_1(" + str(i) + ")")
-        for i in range(data.nbProcess)
-    ]
+    mmc_1 = np.array(
+        [
+            model.add_var(var_type=CONTINUOUS, lb=0, name="mmc_1(" + str(i) + ")")
+            for i in range(data.nbProcess)
+        ]
+    )
 
     # Constraints:
     # Assignment
@@ -276,35 +302,68 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
 
     # Save model
     model.write("model.lp")
-    model.read("model.lp")
-    if verbose:
-        print(
-            "model has {} vars, {} constraints and {} nzs".format(
-                model.num_cols, model.num_rows, model.num_nz
-            )
-        )
 
-    # Solve
-    status = model.optimize(max_seconds=maxTime)
+    # Limitation of the number of processors
+    model.threads = 4
+    model.max_seconds = maxTime
+    model.max_mip_gap = 1e-4
+    model.max_mip_gap_abs = 1
+    model.solver.set_verbose(verbose)
+
+    # Launching the stopwatch
+    start = time.perf_counter()
+
+    # Model resolution
+    status = model.optimize()
+
+    # Stopping the stopwatch and resolution time calculation
+    runtime = time.perf_counter() - start
+
+    print("\n----------------------------------")
     if status == OptimizationStatus.OPTIMAL:
-        print("optimal solution cost {} found".format(model.objective_value))
+        print("Optimization status: OPTIMAL")
     elif status == OptimizationStatus.FEASIBLE:
         print(
-            "sol.cost {} found, best possible: {}".format(
-                model.objective_value, model.objective_bound
-            )
+            "Optimization status: TIME LIMIT and A FEASIBLE SOLUTION COMPUTED (WITHOUT OPTIMALITY GUARANTEE)"
         )
     elif status == OptimizationStatus.NO_SOLUTION_FOUND:
+        print("Optimization status: TIME LIMIT and NO SOLUTION COMPUTED")
+    elif (
+        status == OptimizationStatus.INFEASIBLE
+        or status == OptimizationStatus.INT_INFEASIBLE
+    ):
+        print("Optimization status: INFEASIBLE")
+    elif status == OptimizationStatus.UNBOUNDED:
+        print("Optimization status: UNBOUNDED")
+
+    print("Solution time (s) : ", runtime)
+    print("----------------------------------")
+
+    assignment = np.empty(data.nbProcess, dtype=int)
+    val = -1
+    # If the model has been solved to optimality or if a solution has been found within the given time limit
+    if model.num_solutions > 0:
         print(
-            "no feasible solution found, lower bound is: {}".format(
-                model.objective_bound
-            )
+            "Objective function value of the computed solution: ",
+            round(model.objective_value),
         )
+        val = round(model.objective_value)
+        print(
+            "Best lower bound on the optimal objective function value: ",
+            model.objective_bound,
+        )
+        for p in range(data.nbProcess):
+            for m in range(data.nbMachines):
+                # 0.9 is used since the value of binary variables can sometimes be 0.99999 or 0.00001
+                if x[p][m].x > 0.9 and x[p][m].name.startswith("x"):
+                    if verbose:
+                        if data.initialAssignment[p] != m:
+                            print("\t Process ", p, " moved to machine ", m)
+                        else:
+                            print("\t Process ", p, " remained in machine ", m)
+                    assignment[p] = m
+    else:
+        print("No solution computed")
+    print("----------------------------------\n")
 
-    assignment = []
-    for p in range(data.nbProcess):
-        for m in range(data.nbMachines):
-            if x[p][m].x > 0.9:
-                assignment.append(m)
-
-    return pb.Solution(assignment, model.objective_value)
+    return pb.Solution(assignment, val)
