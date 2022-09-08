@@ -114,7 +114,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     )
 
     # Constraints:
-
+    # Sets definition:
     initialProcessesInMachine = np.frompyfunc(list, 0, 1)(
         np.empty(data.nbMachines, dtype=object)
     )
