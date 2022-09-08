@@ -323,9 +323,9 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     model.write("model.lp")
 
     # Limitation of the number of processors
-    model.threads = 4
+    model.threads = 1
     model.max_seconds = maxTime
-    model.max_mip_gap = 1e-4
+    model.max_mip_gap = 1e-8
     model.max_mip_gap_abs = 1
     model.solver.set_verbose(verbose)
 
