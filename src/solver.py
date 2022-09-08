@@ -164,7 +164,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                 <= 1
             ), "Conflict_" + str(s) + "_" + str(m)
 
-    # Spread 1
+    """# Spread 1
     for l in range(data.nbLocations):
         for s in range(data.nbServices):
             model += (
@@ -176,8 +176,16 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                     for p in processesOfService[s]
                 )
                 <= data.nbLocations * data.nbServices * y[s][l]
-            ), "Spread_1_" + str(l) + "_" + str(s)
+            ), "Spread_1_" + str(l) + "_" + str(s) """
 
+    # Spread 1
+    for l in range(data.nbLocations):
+        for s in range(data.nbServices):
+            for p in processesOfService[s]:
+                for m in machinesOfLocation[l]:
+                    model += (
+                        x[p][m] <= y[s][l], "Spread_1_" + str(l) + "_" + str(s)
+                    )
 
     # Spread 2
     for l in range(data.nbLocations):
@@ -320,7 +328,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     model.write("model.lp")
 
     # Limitation of the number of processors
-    model.threads = 4
+    model.threads = 3
     model.max_seconds = maxTime
     model.max_mip_gap = 1e-4
     model.max_mip_gap_abs = 1

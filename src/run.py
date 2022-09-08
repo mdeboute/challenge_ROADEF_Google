@@ -36,8 +36,8 @@ def mainFunction(
 
 
 if __name__ == "__main__":
-    instanceFilename = "./data/dataA/model_a1_3.txt"
-    assignmentFilename = "./data/dataA/assignment_a1_3.txt"
+    instanceFilename = "./data/model_toy.txt"
+    assignmentFilename = "./data/assignment_toy.txt"
     timeLimit = 600
 
     if len(sys.argv) == 4:
@@ -48,4 +48,4 @@ if __name__ == "__main__":
         assignmentFilename = sys.argv[2]
         timeLimit = int(sys.argv[3])
 
-    mainFunction(instanceFilename, assignmentFilename, True, timeLimit)
+    mainFunction(instanceFilename, assignmentFilename, False, timeLimit)
