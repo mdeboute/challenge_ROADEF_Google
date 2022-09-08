@@ -23,7 +23,7 @@ def mainFunction(
     checker.check(data, solutionTemp, verbose)  # check if the solution is feasible
 
     # solve the problem
-    solution = solve(data, maxTime, verbose)
+    solution = solve(data, maxTime, verbose=False)
 
     if verbose:  # print the solution
         print("Solution of cost ", solution.cost)
@@ -40,16 +40,16 @@ def mainFunction(
 if __name__ == "__main__":
     if len(sys.argv) != 5:
         print(
-            "You should provide exactly 4 arguments: instanceFilename, assignmentFilename, timeLimit and verbose"
+            "You should provide exactly 4 arguments: instanceFilename, assignmentFilename, timeLimit and verbose (int)"
         )
         print(
-            "Usage: python3 src/run.py ./data/dataA/model_a1_1.txt ./data/dataA/assignment_a1_1.txt 300 True"
+            "Usage: python3 src/run.py ./data/dataA/model_a1_1.txt ./data/dataA/assignment_a1_1.txt 300 0"
         )
         exit(1)
 
     instanceFilename = sys.argv[1]
     assignmentFilename = sys.argv[2]
     timeLimit = int(sys.argv[3])
-    verbose = bool(sys.argv[4])
+    verbose = bool(int(sys.argv[4]))
 
     mainFunction(instanceFilename, assignmentFilename, verbose, timeLimit)

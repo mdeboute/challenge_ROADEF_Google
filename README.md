@@ -1,19 +1,5 @@
 # challenge_ROADEF_Google
 
-Activer l'env. virtuel :
-
 ```shell
-source .venv/bin/activate
-```
-
-Le fermer :
-
-```shell
-exit
-```
-
-Exécuter le script Python :
-
-```shell
-python3 src/run.py
+Usage: python3 src/run.py ./data/dataA/model_a1_1.txt ./data/dataA/assignment_a1_1.txt 300 0
 ```

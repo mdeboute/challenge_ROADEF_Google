@@ -251,9 +251,8 @@ def checkConstraints(data: pb.Data, solution: pb.Solution, verbose: bool) -> boo
     return ok
 
 
-def computeLoadCost(data: pb.Data, solution: pb.Solution) -> int:
+def computeLoadCost(data: pb.Data, solution: pb.Solution, verbose: bool) -> int:
     val = 0
-
     # resource consumption for each machine and each resource
     resourceConsumption = np.zeros((data.nbMachines, data.nbResources), dtype=np.int64)
     for r in range(data.nbResources):
@@ -267,21 +266,24 @@ def computeLoadCost(data: pb.Data, solution: pb.Solution) -> int:
             if data.weightLoadCost[r] * max(
                 0, resourceConsumption[m, r] - data.softResCapacities[m, r] > 0
             ):
-                print(
-                    "Machine ",
-                    m,
-                    " Resource ",
-                    r,
-                    " U(" + str(m) + "," + str(r) + ") = ",
-                    resourceConsumption[m, r],
-                    " SC(" + str(m) + "," + str(r) + ") = ",
-                    data.softResCapacities[m, r],
-                    " weight = ",
-                    data.weightLoadCost[r],
-                    " loadCost = ",
-                    data.weightLoadCost[r]
-                    * max(0, resourceConsumption[m, r] - data.softResCapacities[m, r]),
-                )
+                if verbose:
+                    print(
+                        "Machine ",
+                        m,
+                        " Resource ",
+                        r,
+                        " U(" + str(m) + "," + str(r) + ") = ",
+                        resourceConsumption[m, r],
+                        " SC(" + str(m) + "," + str(r) + ") = ",
+                        data.softResCapacities[m, r],
+                        " weight = ",
+                        data.weightLoadCost[r],
+                        " loadCost = ",
+                        data.weightLoadCost[r]
+                        * max(
+                            0, resourceConsumption[m, r] - data.softResCapacities[m, r]
+                        ),
+                    )
             val += data.weightLoadCost[r] * max(
                 0, resourceConsumption[m, r] - data.softResCapacities[m, r]
             )
@@ -289,9 +291,8 @@ def computeLoadCost(data: pb.Data, solution: pb.Solution) -> int:
     return val
 
 
-def computeBalanceCost(data: pb.Data, solution: pb.Solution) -> int:
+def computeBalanceCost(data: pb.Data, solution: pb.Solution, verbose: bool) -> int:
     totalBalanceCost = 0
-
     # for each balance cost data
     for b in data.balanceTriples:
         # table that will contain the remaining capacity for resource r1 on each machine
@@ -308,19 +309,20 @@ def computeBalanceCost(data: pb.Data, solution: pb.Solution) -> int:
         # sum over all machines of the balance costs
         for m in range(data.nbMachines):
             if max(0, b.target * slack_r1[m] - slack_r2[m]) > 0:
-                print(
-                    "Machine ",
-                    m,
-                    " ",
-                    "A(" + str(m) + "," + str(b.resource1) + ") = ",
-                    slack_r1[m],
-                    " A(" + str(m) + "," + str(b.resource2) + ") = ",
-                    slack_r2[m],
-                    "target = ",
-                    b.target,
-                    " balanceCost = ",
-                    max(0, b.target * slack_r1[m] - slack_r2[m]),
-                )
+                if verbose:
+                    print(
+                        "Machine ",
+                        m,
+                        " ",
+                        "A(" + str(m) + "," + str(b.resource1) + ") = ",
+                        slack_r1[m],
+                        " A(" + str(m) + "," + str(b.resource2) + ") = ",
+                        slack_r2[m],
+                        "target = ",
+                        b.target,
+                        " balanceCost = ",
+                        max(0, b.target * slack_r1[m] - slack_r2[m]),
+                    )
             localBalanceCost += max(0, b.target * slack_r1[m] - slack_r2[m])
         totalBalanceCost += b.weight * localBalanceCost
 
@@ -357,8 +359,8 @@ def computeServiceMoveCost(data: pb.Data, solution: pb.Solution) -> int:
 
 
 def getCost(data: pb.Data, solution: pb.Solution, verbose: bool) -> float:
-    loadCost = computeLoadCost(data, solution)
-    balanceCost = computeBalanceCost(data, solution)
+    loadCost = computeLoadCost(data, solution, verbose)
+    balanceCost = computeBalanceCost(data, solution, verbose)
     processMoveCost = computeProcessMoveCost(data, solution)
     machineMoveCost = computeMachineMoveCost(data, solution)
     serviceMoveCost = computeServiceMoveCost(data, solution)
@@ -401,8 +403,9 @@ def checkCost(data: pb.Data, solution: pb.Solution, verbose: bool) -> bool:
 
     totalCost = getCost(data, solution, verbose)
 
-    print("Objective function (computed by the checker) = ", totalCost)
-    print("Objective function (recorded in the solution) = ", solution.cost)
+    if verbose:
+        print("Objective function (computed by the checker) = ", totalCost)
+        print("Objective function (recorded in the solution) = ", solution.cost)
     if totalCost != solution.cost:
         print(
             "ERROR: The cost recorded in the solution is not correct (set verbose to True for the detailed values)"

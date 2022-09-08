@@ -194,7 +194,17 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
         for s in range(data.nbServices):
             for p in processesOfService[s]:
                 for m in machinesOfLocation[l]:
-                    model += (x[p][m] <= y[s][l], "Spread_1_" + str(l) + "_" + str(s))
+                    model += (
+                        x[p][m] <= y[s][l],
+                        "Spread_1_"
+                        + str(l)
+                        + "_"
+                        + str(s)
+                        + "_"
+                        + str(p)
+                        + "_"
+                        + str(m),
+                    )
 
     # Spread 2
     for l in range(data.nbLocations):
