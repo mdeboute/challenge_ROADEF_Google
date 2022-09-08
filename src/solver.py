@@ -175,13 +175,9 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     # Spread 1
     for l in range(data.nbLocations):
         for s in range(data.nbServices):
-            model += (
-                xsum(
-                    xsum(x[p][m] for m in machinesOfLocation[l])
-                    for p in processesOfService[s]
-                )
-                <= data.nbLocations * data.nbServices * y[s][l]
-            ), "Spread_1_" + str(l) + "_" + str(s)
+            for p in processesOfService[s]:
+                for m in machinesOfLocation[l]:
+                    model += (x[p][m] <= y[s][l], "Spread_1_" + str(l) + "_" + str(s))
 
     # Spread 2
     for l in range(data.nbLocations):
