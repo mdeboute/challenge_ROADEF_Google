@@ -11,7 +11,8 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
 
     model = Model(name="GoogleChallenge", sense=MINIMIZE, solver_name=GRB)
 
-    # Variables:
+    ### Decision Variables ###
+
     # main variable indicating if a process p is assigned to the machine m
     x = np.array(
         [
@@ -45,7 +46,9 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
         ]
     )
 
-    # auxiliary variable to compute the ucsed capacity beyond the safety capacity
+    ### Cost Variables ###
+
+    # auxiliary variable to compute the used capacity beyond the safety capacity
     # of resource r on machine m
     lc_1 = np.array(
         [
@@ -61,6 +64,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
         ]
     )
 
+    # auxiliary variable to compute the load cost of resource r on all machines
     lc_2 = np.array(
         [
             model.add_var(var_type=CONTINUOUS, lb=0, name="lc_2(" + str(r) + ")")
@@ -68,6 +72,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
         ]
     )
 
+    # auxiliary variable to compute the free capacity of resource r on machine m
     a = np.array(
         [
             [
@@ -80,6 +85,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
         ]
     )
 
+    # auxiliary variable to compute the balance of resources on machine m for triplet b
     bc_1 = np.array(
         [
             [
@@ -94,6 +100,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
         ]
     )
 
+    # auxiliary variable to compute the balance cost of triplet b
     bc_2 = np.array(
         [
             model.add_var(var_type=CONTINUOUS, lb=0, name="bc_2(" + str(b) + ")")
@@ -101,6 +108,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
         ]
     )
 
+    # auxiliary variable to compute the amount of moved processes of service s
     smc_1 = np.array(
         [
             model.add_var(var_type=CONTINUOUS, lb=0, name="smc_1(" + str(s) + ")")
@@ -108,8 +116,10 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
         ]
     )
 
+    # auxiliary variable to compute the service move cost
     smc_2 = model.add_var(var_type=CONTINUOUS, lb=0, name="smc_2")
 
+    # auxiliary variable to compute the machine move cost of process p
     mmc_1 = np.array(
         [
             model.add_var(var_type=CONTINUOUS, lb=0, name="mmc_1(" + str(p) + ")")
@@ -117,7 +127,10 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
         ]
     )
 
-    # Constraints:
+    # auxiliary variable to compute the machine move cost
+    mmc_2 = model.add_var(var_type=CONTINUOUS, lb=0, name="mmc_2")
+
+    ### Constraints ###
     # Sets definition:
     initialProcessesInMachine = np.frompyfunc(list, 0, 1)(
         np.empty(data.nbMachines, dtype=object)
@@ -251,7 +264,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                 >= z[s][n]
             ), "Dependency_3_" + str(s) + "_" + str(n)
 
-    # Objective constraints:
+    ### Cost computation constraints ###
     # Load cost
     for r in range(data.nbResources):
         for m in range(data.nbMachines):
@@ -307,7 +320,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
 
     mmc_2 = xsum(mmc_1[p] for p in range(data.nbProcess))
 
-    # Objective
+    ### Objective ###
     model.objective = minimize(
         xsum(data.weightLoadCost[r] * lc_2[r] for r in range(data.nbResources))
         + xsum(
