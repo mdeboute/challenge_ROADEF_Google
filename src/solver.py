@@ -13,6 +13,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     model.verbose = int(verbose)
 
     # Variables:
+    # main variable indicating if a process p is assigned to the machine m
     x = np.array(
         [
             [
@@ -23,6 +24,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
         ]
     )
 
+    # auxiliary variable indicating if service s has at least one process in location l
     y = np.array(
         [
             [
@@ -33,6 +35,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
         ]
     )
 
+    # auxiliary variable indicating if service s has at least one process in neighborhood n
     z = np.array(
         [
             [
@@ -43,6 +46,8 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
         ]
     )
 
+    # auxiliary variable to compute the ucsed capacity beyond the safety capacity 
+    # of resource r on machine m
     lc_1 = np.array(
         [
             [
