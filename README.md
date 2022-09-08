@@ -15,5 +15,5 @@ exit
 Exécuter le script Python :
 
 ```shell
-python src/run.py
+python3 src/run.py
 ```
