@@ -406,10 +406,10 @@ def checkCost(data: pb.Data, solution: pb.Solution, verbose: bool) -> bool:
     if verbose:
         print("Objective function (computed by the checker) = ", totalCost)
         print("Objective function (recorded in the solution) = ", solution.cost)
-    if totalCost != solution.cost:
-        print(
-            "ERROR: The cost recorded in the solution is not correct (set verbose to True for the detailed values)"
-        )
+        if totalCost != solution.cost:
+            print(
+                "ERROR: The cost recorded in the solution is not correct (set verbose to True for the detailed values)"
+            )
 
 
 # Checks that the given solution : feasible ? cost correctly computed ?
