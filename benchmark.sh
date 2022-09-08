@@ -2,7 +2,7 @@
 
 
 if [ $# -ne 3 ]; then
-    echo "Usage: ./benchmark.sh <dataDir> <timeLimit> <verbose>"
+    echo "Usage: ./benchmark.sh <dataDir> <timeLimit (sec)> <verbose (int)>"
     exit 1
 fi
 
