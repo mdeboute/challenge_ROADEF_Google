@@ -10,7 +10,6 @@ import time
 def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
 
     model = Model(name="GoogleChallenge", sense=MINIMIZE, solver_name=GRB)
-    model.verbose = int(verbose)
 
     # Variables:
     # main variable indicating if a process p is assigned to the machine m
@@ -46,7 +45,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
         ]
     )
 
-    # auxiliary variable to compute the ucsed capacity beyond the safety capacity 
+    # auxiliary variable to compute the ucsed capacity beyond the safety capacity
     # of resource r on machine m
     lc_1 = np.array(
         [
@@ -328,7 +327,8 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     model.max_seconds = maxTime
     model.max_mip_gap = 1e-8
     model.max_mip_gap_abs = 1
-    model.solver.set_verbose(verbose)
+    model.solver.set_verbose(int(verbose))
+    model.verbose = verbose
 
     # Launching the stopwatch
     start = time.perf_counter()
@@ -356,7 +356,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     elif status == OptimizationStatus.UNBOUNDED:
         print("Optimization status: UNBOUNDED")
 
-    print("Solution time (s) : ", runtime)
+    print("Solution time (sec) : ", runtime)
     print("----------------------------------")
 
     assignment = np.empty(data.nbProcess, dtype=int)
