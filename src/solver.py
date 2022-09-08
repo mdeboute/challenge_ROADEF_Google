@@ -16,30 +16,30 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     x = np.array(
         [
             [
-                model.add_var(var_type=BINARY, name="x(" + str(i) + "," + str(j) + ")")
-                for i in range(data.nbMachines)
+                model.add_var(var_type=BINARY, name="x(" + str(p) + "," + str(m) + ")")
+                for m in range(data.nbMachines)
             ]
-            for j in range(data.nbProcess)
+            for p in range(data.nbProcess)
         ]
     )
 
     y = np.array(
         [
             [
-                model.add_var(var_type=BINARY, name="y(" + str(i) + "," + str(j) + ")")
-                for i in range(data.nbLocations)
+                model.add_var(var_type=BINARY, name="y(" + str(s) + "," + str(l) + ")")
+                for l in range(data.nbLocations)
             ]
-            for j in range(data.nbServices)
+            for s in range(data.nbServices)
         ]
     )
 
     z = np.array(
         [
             [
-                model.add_var(var_type=BINARY, name="z(" + str(i) + "," + str(j) + ")")
-                for i in range(data.nbNeighborhoods)
+                model.add_var(var_type=BINARY, name="z(" + str(s) + "," + str(n) + ")")
+                for n in range(data.nbNeighborhoods)
             ]
-            for j in range(data.nbServices)
+            for s in range(data.nbServices)
         ]
     )
 
@@ -49,28 +49,28 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                 model.add_var(
                     var_type=CONTINUOUS,
                     lb=0,
-                    name="lc_1(" + str(i) + "," + str(j) + ")",
+                    name="lc_1(" + str(m) + "," + str(r) + ")",
                 )
-                for i in range(data.nbResources)
+                for r in range(data.nbResources)
             ]
-            for j in range(data.nbMachines)
+            for m in range(data.nbMachines)
         ]
     )
 
     lc_2 = np.array(
         [
-            model.add_var(var_type=CONTINUOUS, lb=0, name="lc_2(" + str(i) + ")")
-            for i in range(data.nbResources)
+            model.add_var(var_type=CONTINUOUS, lb=0, name="lc_2(" + str(r) + ")")
+            for r in range(data.nbResources)
         ]
     )
 
     a = np.array(
         [
             [
-                model.add_var(var_type=CONTINUOUS, lb=0, name="a(" + str(i) + ")")
-                for i in range(data.nbResources)
+                model.add_var(var_type=CONTINUOUS, lb=0, name="a(" + str(m) + "," + str(r) + ")")
+                for r in range(data.nbResources)
             ]
-            for j in range(data.nbMachines)
+            for m in range(data.nbMachines)
         ]
     )
 
@@ -80,25 +80,25 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                 model.add_var(
                     var_type=CONTINUOUS,
                     lb=0,
-                    name="bc_1(" + str(i) + "," + str(j) + ")",
+                    name="bc_1(" + str(b) + "," + str(m) + ")",
                 )
-                for i in range(data.nbMachines)
+                for m in range(data.nbMachines)
             ]
-            for j in range(data.nbBalanceTriples)
+            for b in range(data.nbBalanceTriples)
         ]
     )
 
     bc_2 = np.array(
         [
-            model.add_var(var_type=CONTINUOUS, lb=0, name="bc_2(" + str(i) + ")")
-            for i in range(data.nbBalanceTriples)
+            model.add_var(var_type=CONTINUOUS, lb=0, name="bc_2(" + str(b) + ")")
+            for b in range(data.nbBalanceTriples)
         ]
     )
 
     smc_1 = np.array(
         [
-            model.add_var(var_type=CONTINUOUS, lb=0, name="smc_1(" + str(i) + ")")
-            for i in range(data.nbServices)
+            model.add_var(var_type=CONTINUOUS, lb=0, name="smc_1(" + str(s) + ")")
+            for s in range(data.nbServices)
         ]
     )
 
@@ -106,12 +106,39 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
 
     mmc_1 = np.array(
         [
-            model.add_var(var_type=CONTINUOUS, lb=0, name="mmc_1(" + str(i) + ")")
-            for i in range(data.nbProcess)
+            model.add_var(var_type=CONTINUOUS, lb=0, name="mmc_1(" + str(p) + ")")
+            for p in range(data.nbProcess)
         ]
     )
 
     # Constraints:
+
+    initialProcessesInMachine =  np.frompyfunc(list, 0, 1)(np.empty(data.nbMachines, dtype=object))
+    initialProcessesNotInMachine =  np.frompyfunc(list, 0, 1)(np.empty(data.nbMachines, dtype=object))
+    processesOfService =  np.frompyfunc(list, 0, 1)(np.empty(data.nbServices, dtype=object))
+    machinesOfLocation =  np.frompyfunc(list, 0, 1)(np.empty(data.nbLocations, dtype=object))
+    machinesOfNeighbourhood =   np.frompyfunc(list, 0, 1)(np.empty(data.nbNeighborhoods, dtype=object))
+
+    for m in range(data.nbMachines):
+        for p in range(data.nbProcess):
+            if data.initialAssignment[p]==m:
+                initialProcessesInMachine[m].append(p)
+            else:
+                initialProcessesNotInMachine[m].append(p)
+        
+        for l in range(data.nbLocations):
+            if data.locations[m]==l:
+                machinesOfLocation[l].append(m)
+        
+        for n in range(data.nbNeighborhoods):
+            if data.neighborhoods[m]==n:
+                machinesOfNeighbourhood[n].append(m)
+    
+    for p in range(data.nbProcess):   
+        for s in range(data.nbServices):
+            if data.servicesProcess[p]==s:
+                processesOfService[s].append(p)
+
     # Assignment
     for p in range(data.nbProcess):
         model += xsum(
@@ -132,8 +159,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
             model += (
                 xsum(
                     x[p][m]
-                    for p in range(data.nbServices)
-                    if data.servicesProcess[p] == s
+                    for p in processesOfService[s]
                 )
                 <= 1
             ), "Conflict_" + str(s) + "_" + str(m)
@@ -145,14 +171,13 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                 xsum(
                     xsum(
                         x[p][m]
-                        for p in range(data.nbProcess)
-                        if data.servicesProcess[p] == s
+                        for m in machinesOfLocation[l]
                     )
-                    for m in range(data.nbMachines)
-                    if data.locations[m] == l
+                    for p in processesOfService[s]
                 )
                 <= data.nbLocations * data.nbServices * y[s][l]
             ), "Spread_1_" + str(l) + "_" + str(s)
+
 
     # Spread 2
     for l in range(data.nbLocations):
@@ -161,11 +186,9 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                 xsum(
                     xsum(
                         x[p][m]
-                        for p in range(data.nbProcess)
-                        if data.servicesProcess[p] == s
+                        for p in processesOfService[s]
                     )
-                    for m in range(data.nbMachines)
-                    if data.locations[m] == l
+                    for m in machinesOfLocation[l]
                 )
                 >= y[s][l],
                 "Spread_2_" + str(l) + "_" + str(s),
@@ -175,7 +198,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     for s in range(data.nbServices):
         model += (
             xsum(y[s][l] for l in range(data.nbLocations)) >= data.spreadMin[s],
-            "Spread_3" + str(s),
+            "Spread_3_" + str(s),
         )
 
     # Transient
@@ -185,13 +208,11 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                 model += (
                     xsum(
                         data.processReq[p][r]
-                        for p in range(data.nbProcess)
-                        if data.initialAssignment[p] == m
+                        for p in initialProcessesInMachine[m]
                     )
                     + xsum(
                         data.processReq[p][r] * x[p][m]
-                        for p in range(data.nbProcess)
-                        if data.initialAssignment[p] != m
+                        for p in initialProcessesNotInMachine[m]
                     )
                     <= data.hardResCapacities[m][r]
                 ), "Transient" + str(r) + "_" + str(m)
@@ -200,19 +221,17 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     for s1 in range(data.nbServices):
         for s2 in data.dependencies[s1]:
             for n in range(data.nbNeighborhoods):
-                model += z[s1][n] <= z[s2][n], "Dependency_1" + str(s1) + "_" + str(s2)
+                model += z[s1][n] <= z[s2][n], "Dependency_1_" + str(s1) + "_" + str(s2) + "_" + str(n)
 
     # Dependency 2
     for s in range(data.nbServices):
         for n in range(data.nbNeighborhoods):
-            for p in range(data.nbProcess):
-                if data.servicesProcess[p] == s:
-                    for m in range(data.nbMachines):
-                        if data.neighborhoods[m] == n:
-                            model += (
-                                (x[p][m] <= z[s][n]),
-                                "Dependency_2" + str(s) + "_" + str(n) + "_" + str(p),
-                            )
+            for p in processesOfService[s]:
+                for m in machinesOfNeighbourhood[n]:
+                    model += (
+                        (x[p][m] <= z[s][n]),
+                        "Dependency_2_" + str(s) + "_" + str(n) + "_" + str(p) + "_" + str(m)
+                    )
 
     # Dependency 3
     for s in range(data.nbServices):
@@ -221,14 +240,12 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
                 xsum(
                     xsum(
                         x[p][m]
-                        for m in range(data.nbMachines)
-                        if data.neighborhoods[m] == n
+                        for m in machinesOfNeighbourhood[n]
                     )
-                    for p in range(data.nbProcess)
-                    if data.servicesProcess[p] == s
+                    for p in processesOfService[s]
                 )
                 >= z[s][n]
-            ), "Dependency_3" + str(s) + "_" + str(n)
+            ), "Dependency_3_" + str(s) + "_" + str(n)
 
     # Objective constraints:
     # Load cost
@@ -272,8 +289,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     for s in range(data.nbServices):
         smc_1[s] = xsum(
             (1 - x[p][data.initialAssignment[p]])
-            for p in range(data.nbProcess)
-            if data.servicesProcess[p] == s
+            for p in processesOfService[s]
         )
 
     for s in range(data.nbServices):
