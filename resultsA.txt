@@ -1,0 +1,141 @@
+Ven 9 sep 2022 01:52:39 CEST
+Solving instance 1
+-----------------------------------------------------------------------------
+Academic license - for non-commercial use only
+
+----------------------------------
+Optimization status: OPTIMAL
+Solution time (sec) :  0.06857929600000001
+----------------------------------
+Objective function value of the computed solution:  44306501
+Best lower bound on the optimal objective function value:  44306501.0
+----------------------------------
+
+-----------------------------------------------------------------------------
+Solving instance 2
+-----------------------------------------------------------------------------
+Academic license - for non-commercial use only
+
+----------------------------------
+Optimization status: TIME LIMIT and A FEASIBLE SOLUTION COMPUTED (WITHOUT OPTIMALITY GUARANTEE)
+Solution time (sec) :  3600.694350852
+----------------------------------
+Objective function value of the computed solution:  777531842
+Best lower bound on the optimal objective function value:  777530860.3776584
+----------------------------------
+
+-----------------------------------------------------------------------------
+Solving instance 3
+-----------------------------------------------------------------------------
+Academic license - for non-commercial use only
+
+----------------------------------
+Optimization status: OPTIMAL
+Solution time (sec) :  16.328425812000003
+----------------------------------
+Objective function value of the computed solution:  583005719
+Best lower bound on the optimal objective function value:  583005713.9635247
+----------------------------------
+
+-----------------------------------------------------------------------------
+Solving instance 4
+-----------------------------------------------------------------------------
+Academic license - for non-commercial use only
+
+----------------------------------
+Optimization status: TIME LIMIT and A FEASIBLE SOLUTION COMPUTED (WITHOUT OPTIMALITY GUARANTEE)
+Solution time (sec) :  3600.0963960390004
+----------------------------------
+Objective function value of the computed solution:  262086758
+Best lower bound on the optimal objective function value:  242409999.9292295
+----------------------------------
+
+-----------------------------------------------------------------------------
+Solving instance 5
+-----------------------------------------------------------------------------
+Academic license - for non-commercial use only
+
+----------------------------------
+Optimization status: OPTIMAL
+Solution time (sec) :  2.230387406
+----------------------------------
+Objective function value of the computed solution:  727578311
+Best lower bound on the optimal objective function value:  727578308.0649532
+----------------------------------
+
+-----------------------------------------------------------------------------
+Solving instance 6
+-----------------------------------------------------------------------------
+Academic license - for non-commercial use only
+
+----------------------------------
+Optimization status: TIME LIMIT and A FEASIBLE SOLUTION COMPUTED (WITHOUT OPTIMALITY GUARANTEE)
+Solution time (sec) :  3600.001314257
+----------------------------------
+Objective function value of the computed solution:  8592396
+Best lower bound on the optimal objective function value:  118.0
+----------------------------------
+
+-----------------------------------------------------------------------------
+Solving instance 7
+-----------------------------------------------------------------------------
+Academic license - for non-commercial use only
+
+----------------------------------
+Optimization status: TIME LIMIT and A FEASIBLE SOLUTION COMPUTED (WITHOUT OPTIMALITY GUARANTEE)
+Solution time (sec) :  3600.095631904
+----------------------------------
+Objective function value of the computed solution:  1111598241
+Best lower bound on the optimal objective function value:  551527123.9996058
+----------------------------------
+
+-----------------------------------------------------------------------------
+Solving instance 8
+-----------------------------------------------------------------------------
+Academic license - for non-commercial use only
+
+----------------------------------
+Optimization status: TIME LIMIT and A FEASIBLE SOLUTION COMPUTED (WITHOUT OPTIMALITY GUARANTEE)
+Solution time (sec) :  3599.890518787
+----------------------------------
+Objective function value of the computed solution:  1375256887
+Best lower bound on the optimal objective function value:  1038526333.0675446
+----------------------------------
+
+-----------------------------------------------------------------------------
+Solving instance 9
+-----------------------------------------------------------------------------
+Academic license - for non-commercial use only
+
+----------------------------------
+Optimization status: TIME LIMIT and NO SOLUTION COMPUTED
+Solution time (sec) :  3599.978667631
+----------------------------------
+No solution computed
+----------------------------------
+
+The machine ID is wrong for process  1  : current value = 35871566856367
+Test failed
+ERROR: Cannot check the solution
+The machine ID is wrong for process  1  : current value = 35871566856367
+Test failed
+ERROR: Cannot check the solution
+-----------------------------------------------------------------------------
+Solving instance 10
+-----------------------------------------------------------------------------
+Academic license - for non-commercial use only
+
+----------------------------------
+Optimization status: TIME LIMIT and NO SOLUTION COMPUTED
+Solution time (sec) :  3599.947516055
+----------------------------------
+No solution computed
+----------------------------------
+
+The machine ID is wrong for process  1  : current value = 190898411443056
+Test failed
+ERROR: Cannot check the solution
+The machine ID is wrong for process  1  : current value = 190898411443056
+Test failed
+ERROR: Cannot check the solution
+-----------------------------------------------------------------------------

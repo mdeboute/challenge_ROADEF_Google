@@ -1,5 +1,4 @@
-# Usage: ./benchmark.sh <dataDir> <timeLimit> <verbose>
-
+#!/bin/bash
 
 if [ $# -ne 3 ]; then
     echo "Usage: ./benchmark.sh <dataDir> <timeLimit (sec)> <verbose (int)>"

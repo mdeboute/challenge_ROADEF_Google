@@ -131,6 +131,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     mmc_2 = model.add_var(var_type=CONTINUOUS, lb=0, name="mmc_2")
 
     ### Constraints ###
+
     # Sets definition:
     initialProcessesInMachine = np.frompyfunc(list, 0, 1)(
         np.empty(data.nbMachines, dtype=object)
@@ -346,7 +347,7 @@ def solve(data: pb.Data, maxTime: int, verbose: bool) -> pb.Solution:
     model.write("model.lp")
 
     # Limitation of the number of processors
-    model.threads = 1
+    model.threads = -1
     model.max_seconds = maxTime
     model.max_mip_gap = 1e-8
     model.max_mip_gap_abs = 1

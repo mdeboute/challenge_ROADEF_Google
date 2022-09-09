@@ -131,9 +131,5 @@ dmypy.json
 # Poetry
 poetry.lock
 
-# Draft
-dump.py
-codeprof.py
-
 # LP model
 model.lp

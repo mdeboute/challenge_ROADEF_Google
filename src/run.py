@@ -40,16 +40,16 @@ def mainFunction(
 if __name__ == "__main__":
     if len(sys.argv) != 5:
         print(
-            "You should provide exactly 4 arguments: instanceFilename, assignmentFilename, timeLimit (sec) and verbose (int)"
+            "You should provide exactly 4 arguments: instance_filename, assignment_filename, time_limit (s) and verbose (int)"
         )
         print(
-            "Usage: python3 src/run.py ./data/dataA/model_a1_1.txt ./data/dataA/assignment_a1_1.txt 300 0"
+            "Usage: python3 src/run.py <model_file> <assignment_file> <time_limit (s)> <verbose (int)>"
         )
         exit(1)
 
-    instanceFilename = sys.argv[1]
-    assignmentFilename = sys.argv[2]
-    timeLimit = int(sys.argv[3])
+    instance_filename = sys.argv[1]
+    assignment_filename = sys.argv[2]
+    time_limit = int(sys.argv[3])
     verbose = bool(int(sys.argv[4]))
 
-    mainFunction(instanceFilename, assignmentFilename, verbose, timeLimit)
+    mainFunction(instance_filename, assignment_filename, verbose, time_limit)
