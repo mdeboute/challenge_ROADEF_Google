@@ -3,7 +3,7 @@
 Solve one instance:
 
 ```shell
-Usage: python3 src/run.py <model_file> <assignement_file> <time_limit (s)> <verbose (int)>
+Usage: python3 src/run.py <model_file> <assignment_file> <time_limit (s)> <verbose (int)>
 ```
 
 Solve all instances of a directory:
