@@ -15,3 +15,7 @@ Solve all instances of a directory:
 ```shell
 Usage: ./benchmark.sh <data_dir> <time_limit (s)> <verbose (int)>
 ```
+
+## Beamer
+
+[Here](./beamer.pdf) is a small presentation of our model.
